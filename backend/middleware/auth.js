@@ -1,0 +1,70 @@
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+// Protect routes - verify JWT
+const protect = async (req, res, next) => {
+  let token;
+
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select('-password');
+      
+      if (!req.user) {
+        return res.status(401).json({ message: 'User not found' });
+      }
+      
+      if (!req.user.isActive) {
+        return res.status(401).json({ message: 'Account is deactivated' });
+      }
+      
+      next();
+    } catch (error) {
+      console.error('Auth error:', error);
+      return res.status(401).json({ message: 'Not authorized, token failed' });
+    }
+  }
+
+  if (!token) {
+    return res.status(401).json({ message: 'Not authorized, no token' });
+  }
+};
+
+// Role-based access control
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ 
+        message: `User role ${req.user.role} is not authorized to access this route` 
+      });
+    }
+    next();
+  };
+};
+
+// Check if user is admin
+const isAdmin = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Admin access required' });
+  }
+  next();
+};
+
+// Check if user is organizer
+const isOrganizer = (req, res, next) => {
+  if (req.user.role !== 'organizer') {
+    return res.status(403).json({ message: 'Organizer access required' });
+  }
+  next();
+};
+
+// Check if user is participant
+const isParticipant = (req, res, next) => {
+  if (req.user.role !== 'participant') {
+    return res.status(403).json({ message: 'Participant access required' });
+  }
+  next();
+};
+
+module.exports = { protect, authorize, isAdmin, isOrganizer, isParticipant };
