@@ -34,7 +34,7 @@ const sendTicketEmail = async (user, event, registration) => {
       subject: `Registration Confirmed - ${event.name}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #667eea;">🎉 Registration Confirmed!</h1>
+          <h1 style="color: #667eea;"> Registration Confirmed!</h1>
           <p>Hello ${user.firstName},</p>
           <p>Your registration for <strong>${event.name}</strong> has been confirmed.</p>
           <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">

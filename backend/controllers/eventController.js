@@ -15,23 +15,15 @@ const createEvent = async (req, res) => {
       return res.status(403).json({ message: 'Organizer profile not found' });
     }
 
-    // Map capacity and price to registrationLimit and registrationFee
     const eventData = {
       ...req.body,
       organizer: organizer._id,
-      status: 'published', // changed from 'draft' to 'published'
-      registrationLimit: req.body.capacity ? Number(req.body.capacity) : null,
-      registrationFee: req.body.price ? Number(req.body.price) : 0
+      status: 'published' // changed from 'draft' to 'published'
     };
 
     const event = await Event.create(eventData);
 
-    res.status(201).json({
-      ...event.toObject(),
-      registrationCount: event.registrationCount || 0,
-      registrationLimit: event.registrationLimit,
-      registrationFee: event.registrationFee
-    });
+    res.status(201).json(event);
   } catch (error) {
     console.error('Create event error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -111,18 +103,12 @@ const getEvents = async (req, res) => {
       .skip(skip)
       .limit(parseInt(limit));
 
-    // Always include registrationCount, registrationLimit, registrationFee
-    const eventsWithCounts = events.map(event => ({
-      ...event.toObject(),
-      registrationCount: event.registrationCount || 0,
-      registrationLimit: event.registrationLimit,
-      registrationFee: event.registrationFee
-    }));
+    console.log('Events found:', events.map(e => ({ id: e._id, name: e.name, eventType: e.eventType, status: e.status })));
 
     const total = await Event.countDocuments(query);
 
     res.json({
-      events: eventsWithCounts,
+      events,
       page: parseInt(page),
       pages: Math.ceil(total / limit),
       total
@@ -188,18 +174,15 @@ const getEvent = async (req, res) => {
     // Increment view count
     event.viewCount += 1;
     event.recentViews.push({ timestamp: new Date() });
+    
+    // Keep only last 1000 views for efficiency
     if (event.recentViews.length > 1000) {
       event.recentViews = event.recentViews.slice(-1000);
     }
+    
     await event.save();
 
-    // Always include registrationCount, registrationLimit, registrationFee
-    res.json({
-      ...event.toObject(),
-      registrationCount: event.registrationCount || 0,
-      registrationLimit: event.registrationLimit,
-      registrationFee: event.registrationFee
-    });
+    res.json(event);
   } catch (error) {
     console.error('Get event error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -281,7 +264,7 @@ const publishEvent = async (req, res) => {
       try {
         await axios.post(organizer.discordWebhook, {
           embeds: [{
-            title: `🎉 New Event: ${event.name}`,
+            title: ` New Event: ${event.name}`,
             description: event.description.substring(0, 200) + '...',
             color: 0x5865F2,
             fields: [

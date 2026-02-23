@@ -57,7 +57,7 @@ const seedClubs = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('MongoDB connected');
 
-    console.log('\n🎉 Seeding IIIT Clubs...\n');
+    console.log('\n Seeding IIIT Clubs...\n');
 
     for (const clubData of clubs) {
       // Check if club already exists
@@ -79,9 +79,9 @@ const seedClubs = async () => {
             userId: existingClub._id,
             isActive: true
           });
-          console.log(`✅ Created Organizer record for existing user: ${fullName}`);
+          console.log(` Created Organizer record for existing user: ${fullName}`);
         } else {
-          console.log(`⏭️  Club already exists: ${fullName}`);
+          console.log(` Club already exists: ${fullName}`);
         }
         continue;
       }
@@ -107,13 +107,13 @@ const seedClubs = async () => {
         isActive: true
       });
 
-      console.log(`✅ Created: ${fullName}`);
+      console.log(` Created: ${fullName}`);
       console.log(`   Email: ${clubData.email}`);
       console.log(`   Password: ${clubData.password}\n`);
     }
 
-    console.log('\n🎊 All clubs seeded successfully!');
-    console.log('\n📋 Summary:');
+    console.log('\n All clubs seeded successfully!');
+    console.log('\n Summary:');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     clubs.forEach(club => {
       console.log(`   ${club.firstName} ${club.lastName}`);
@@ -121,11 +121,11 @@ const seedClubs = async () => {
       console.log('');
     });
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('\n⚠️  Please change the default passwords after first login!');
+    console.log('\n  Please change the default passwords after first login!');
 
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error seeding clubs:', error);
+    console.error(' Error seeding clubs:', error);
     process.exit(1);
   }
 };

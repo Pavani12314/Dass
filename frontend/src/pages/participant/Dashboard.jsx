@@ -172,7 +172,7 @@ const ParticipantDashboard = () => {
           }}
         />
         <Typography variant="h4" fontWeight={700} gutterBottom sx={{ position: 'relative', zIndex: 1 }}>
-          Welcome back, {user?.firstName}! 👋
+          Welcome back, {user?.firstName}! 
         </Typography>
         <Typography sx={{ opacity: 0.9, position: 'relative', zIndex: 1 }}>
           Manage your event registrations and track your participation

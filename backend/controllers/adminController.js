@@ -154,10 +154,8 @@ const deleteOrganizer = async (req, res) => {
     } else {
       // Permanent delete
       await User.findByIdAndDelete(organizer.userId);
-      // Delete all events created by this organizer
-      await Event.deleteMany({ organizer: organizer._id });
       await Organizer.findByIdAndDelete(req.params.id);
-      res.json({ message: 'Organizer and all their events permanently deleted' });
+      res.json({ message: 'Organizer permanently deleted' });
     }
   } catch (error) {
     console.error('Delete organizer error:', error);

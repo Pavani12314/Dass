@@ -123,7 +123,7 @@ const Onboarding = () => {
       <Container maxWidth="md">
         <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
           <Typography variant="h4" fontWeight={700} gutterBottom textAlign="center">
-            Welcome to Felicity! 🎉
+            Welcome to Felicity! 
           </Typography>
           <Typography color="text.secondary" textAlign="center" sx={{ mb: 4 }}>
             Let's personalize your experience

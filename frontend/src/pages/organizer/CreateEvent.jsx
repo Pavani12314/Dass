@@ -187,11 +187,6 @@ const CreateEvent = () => {
         startDate: eventData.startDate.toISOString(),
         endDate: eventData.endDate.toISOString(),
         registrationDeadline: eventData.registrationDeadline.toISOString(),
-        registrationLimit: eventData.capacity ? Number(eventData.capacity) : null,
-        hackathonDetails: eventData.isTeamEvent ? {
-          minTeamSize: Number(eventData.minTeamSize) || 2,
-          maxTeamSize: Number(eventData.maxTeamSize) || 4,
-        } : undefined,
         customFields: customFields.map(({ id, label, type, required, options }) => ({
           fieldName: label.replace(/\s+/g, '').toLowerCase(),
           fieldType: type,
@@ -201,7 +196,7 @@ const CreateEvent = () => {
         }))
       };
 
-      await api.post('/api/events', payload);
+      await api.post('/events', payload);
       toast.success('Event created successfully!');
       navigate('/organizer/events');
     } catch (error) {

@@ -59,13 +59,12 @@ const createTeam = async (req, res) => {
       return res.status(400).json({ message: 'You are already in a team for this event' });
     }
 
-    // Guard against missing hackathonDetails
-    const minTeamSize = (event.hackathonDetails && event.hackathonDetails.minTeamSize) || 1;
-    const maxTeamSize = (event.hackathonDetails && event.hackathonDetails.maxTeamSize) || 10;
-    const teamSize = maxSize || maxTeamSize;
-    if (teamSize < minTeamSize || teamSize > maxTeamSize) {
+    
+    // Validate team size
+    const teamSize = maxSize || event.hackathonDetails.maxTeamSize;
+    if (teamSize < event.hackathonDetails.minTeamSize || teamSize > event.hackathonDetails.maxTeamSize) {
       return res.status(400).json({ 
-        message: `Team size must be between ${minTeamSize} and ${maxTeamSize}` 
+        message: `Team size must be between ${event.hackathonDetails.minTeamSize} and ${event.hackathonDetails.maxTeamSize}` 
       });
     }
 
@@ -83,7 +82,7 @@ const createTeam = async (req, res) => {
       }],
       inviteCode,
       maxSize: teamSize,
-      minSize: minTeamSize
+      minSize: event.hackathonDetails.minTeamSize
     });
 
     res.status(201).json({
@@ -261,7 +260,7 @@ const completeTeamRegistration = async (req, res) => {
           to: member.user.email,
           subject: `Team Registration Confirmed - ${team.event.name}`,
           html: `
-            <h1>🎉 Team Registration Confirmed!</h1>
+            <h1> Team Registration Confirmed!</h1>
             <p>Hello ${member.user.firstName},</p>
             <p>Your team <strong>${team.name}</strong> has been registered for <strong>${team.event.name}</strong>.</p>
             <p><strong>Ticket ID:</strong> ${ticketId}</p>
@@ -515,10 +514,10 @@ const inviteMember = async (req, res) => {
       return res.status(403).json({ message: 'Only leader can invite members' });
     }
 
-    // Find user by email
+    // Find or create user by email
     let user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: 'User with this email not found. Ask them to register first.' });
+      user = await User.create({ email, firstName: '', lastName: '' });
     }
 
     // Check if already invited or member

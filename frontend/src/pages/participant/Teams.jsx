@@ -80,13 +80,11 @@ const Teams = () => {
 
   const fetchEvents = async () => {
     try {
-      // Fetch all hackathon events regardless of status
-      const response = await api.get('/api/events', { params: { eventType: 'hackathon' } });
+      const response = await api.get('/events', { params: { eventType: 'hackathon', status: 'published' } });
       setEvents(response.data.events || response.data);
-      console.log('Fetched hackathon events:', response.data.events || response.data);
+      console.log('Fetched events:', response.data.events || response.data);
     } catch (error) {
       console.error('Error fetching events:', error);
-      setEvents([]);
     }
   };
 
@@ -136,7 +134,7 @@ const Teams = () => {
   const handleLeaveTeam = async (teamId) => {
     if (!window.confirm('Are you sure you want to leave this team?')) return;
     try {
-      await api.delete(`/api/teams/${teamId}/leave`);
+      await api.post(`/api/teams/${teamId}/leave`);
       setTeams(prev => prev.filter(t => t._id !== teamId));
       toast.success('Left team successfully');
     } catch (error) {
@@ -222,7 +220,7 @@ const Teams = () => {
                           icon={<TeamIcon />}
                         />
                         {team.event && (
-                          <Chip label={team.event.name} size="small" color="primary" />
+                          <Chip label={team.event.title} size="small" color="primary" />
                         )}
                       </Box>
                     </Box>
@@ -360,15 +358,11 @@ const Teams = () => {
             onChange={(e) => setSelectedEventId(e.target.value)}
             sx={{ mt: 2 }}
           >
-            {events.length === 0 ? (
-              <MenuItem disabled>No hackathon events found. Please create one as Organizer.</MenuItem>
-            ) : (
-              events.map(event => (
-                <MenuItem key={event._id} value={event._id}>
-                  {event.name}
-                </MenuItem>
-              ))
-            )}
+            {events.map(event => (
+              <MenuItem key={event._id} value={event._id}>
+                {event.name}
+              </MenuItem>
+            ))}
           </TextField>
           <TextField
             type="number"
